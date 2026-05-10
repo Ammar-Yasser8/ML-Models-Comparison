@@ -1,5 +1,11 @@
+from pathlib import Path
+import sys
+
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, precision_recall_fscore_support
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+from report_utils import save_model_report
 
 import seaborn as sns
 import pandas as pd
@@ -17,4 +23,19 @@ model = LogisticRegression(max_iter=2000)
 
 model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
-print(f"Accuracy: {accuracy_score(y_test, y_pred):.4f}")
+accuracy = accuracy_score(y_test, y_pred)
+precision, recall, f1, _ = precision_recall_fscore_support(y_test, y_pred, average="weighted", zero_division=0)
+matrix = confusion_matrix(y_test, y_pred)
+report = classification_report(y_test, y_pred, zero_division=0)
+
+save_model_report(
+    dataset_name="titanic",
+    model_name="lr",
+    accuracy=accuracy,
+    precision=precision,
+    recall=recall,
+    f1_score=f1,
+    confusion=matrix,
+    class_report=report,
+    output_path=Path(__file__).resolve().parent / "reports" / "lr_report.html",
+)

@@ -14,8 +14,14 @@ models = {
     "rf": "from sklearn.ensemble import RandomForestClassifier\nmodel = RandomForestClassifier()\n"
 }
 
-base_code = """from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
+base_code = """from pathlib import Path
+import sys
+
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, precision_recall_fscore_support
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+from report_utils import save_model_report
 
 {dataset_code}
 
@@ -25,13 +31,28 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
-print(f"Accuracy: {{accuracy_score(y_test, y_pred):.4f}}")
+accuracy = accuracy_score(y_test, y_pred)
+precision, recall, f1, _ = precision_recall_fscore_support(y_test, y_pred, average="weighted", zero_division=0)
+matrix = confusion_matrix(y_test, y_pred)
+report = classification_report(y_test, y_pred, zero_division=0)
+
+save_model_report(
+    dataset_name="{dataset_name}",
+    model_name="{model_name}",
+    accuracy=accuracy,
+    precision=precision,
+    recall=recall,
+    f1_score=f1,
+    confusion=matrix,
+    class_report=report,
+    output_path=Path(__file__).resolve().parent / "reports" / "{model_name}_report.html",
+)
 """
 
 for ds_name, ds_code in datasets.items():
     os.makedirs(ds_name, exist_ok=True)
     for mod_name, mod_code in models.items():
-        code = base_code.format(dataset_code=ds_code, model_code=mod_code)
+        code = base_code.format(dataset_code=ds_code, model_code=mod_code, dataset_name=ds_name, model_name=mod_name)
         with open(f"{ds_name}/{mod_name}.py", "w") as f:
             f.write(code)
 
