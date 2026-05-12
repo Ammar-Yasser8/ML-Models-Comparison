@@ -29,25 +29,12 @@ AI-Tasks/
     lr.py
     rf.py
     svm.py
-    report_utils.py
-    reports/
-      dt_report.html
-      knn_report.html
-      lr_report.html
-      rf_report.html
-      svm_report.html
   iris/
     dt.py
     knn.py
     lr.py
     rf.py
     svm.py
-    reports/
-      dt_report.html
-      knn_report.html
-      lr_report.html
-      rf_report.html
-      svm_report.html
   titanic/
     dt.py
     knn.py
@@ -65,7 +52,6 @@ Each model script follows the same pipeline:
 3. Train model
 4. Predict test labels
 5. Print accuracy
-6. Optionally generate HTML report
 
 ## Dataset Details
 
@@ -85,17 +71,9 @@ Each model script follows the same pipeline:
 | Random Forest | random_state=42 for Iris and Breast Cancer; default on Titanic |
 | SVM | SVC() |
 
-## Reports
+## Outputs
 
-- Breast Cancer: all five scripts generate HTML reports in breast_cancer/reports/.
-- Iris: all five scripts generate HTML reports in iris/reports/.
-- Titanic: scripts print accuracy to console only.
-
-Typical report content:
-
-- Accuracy
-- Test predictions table
-- Full dataset table
+All scripts print accuracy to the console.
 
 ## Requirements
 
@@ -134,10 +112,8 @@ setup_datasets_models.py creates baseline model scripts for each dataset.
 
 ## Notes
 
-- Reporting style differs across dataset folders.
 - Results are most reproducible where random_state=42 is used.
 
 ## Copyright
 
 Copyright (c) 2026 Ammar Yasser. All rights reserved.
-
