@@ -1,37 +1,38 @@
-from pathlib import Path
-import sys
-
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, precision_recall_fscore_support
-
-sys.path.append(str(Path(__file__).resolve().parent.parent))
-from report_utils import save_model_report
-
+from sklearn.metrics import accuracy_score
 from sklearn.datasets import load_breast_cancer
-X, y = load_breast_cancer(return_X_y=True)
+from sklearn.tree import DecisionTreeClassifier
 
+from report_utils import generate_report
+
+
+dataset = load_breast_cancer()
+X = dataset.data
+y = dataset.target
+feature_names = dataset.feature_names
+target_names = dataset.target_names
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-from sklearn.tree import DecisionTreeClassifier
-model = DecisionTreeClassifier()
+model = DecisionTreeClassifier(random_state=42)
 
 
 model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
-precision, recall, f1, _ = precision_recall_fscore_support(y_test, y_pred, average="weighted", zero_division=0)
-matrix = confusion_matrix(y_test, y_pred)
-report = classification_report(y_test, y_pred, zero_division=0)
+print(f"Accuracy: {accuracy:.4f}")
 
-save_model_report(
-    dataset_name="breast_cancer",
-    model_name="dt",
-    accuracy=accuracy,
-    precision=precision,
-    recall=recall,
-    f1_score=f1,
-    confusion=matrix,
-    class_report=report,
-    output_path=Path(__file__).resolve().parent / "reports" / "dt_report.html",
+report_path = generate_report(
+	dataset_name="Breast Cancer",
+	model_name="DT",
+	report_filename="dt_report.html",
+	X=X,
+	y=y,
+	X_test=X_test,
+	y_test=y_test,
+	y_pred=y_pred,
+	feature_names=feature_names,
+	target_names=target_names,
+	accuracy=accuracy,
 )
+print(f"Report generated: {report_path}")
